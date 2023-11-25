@@ -77,7 +77,8 @@ public abstract class AbstractPath implements Path {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Path that)) return false;
+        if (!(o instanceof Path)) return false;
+        Path that = (Path) o;
         return Objects.equals(this.namespace(), that.namespace()) && Objects.equals(this.value(), that.value());
     }
 
