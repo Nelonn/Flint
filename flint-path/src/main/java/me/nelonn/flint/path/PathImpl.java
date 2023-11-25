@@ -20,13 +20,20 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 public class PathImpl extends AbstractPath {
+    public static final String REGEXP = "[a-z0-9/_.-]";
+
     @ApiStatus.Internal
     public PathImpl(@NotNull String namespace, @NotNull String value) {
         super(namespace, value);
     }
 
     @Override
+    protected @NotNull String getExceptionValueRegexp() {
+        return REGEXP;
+    }
+
+    @Override
     protected boolean isAllowedInValue(char character) {
-        return character == '_' || character == '-' || (character >= 'a' && character <= 'z') || (character >= '0' && character <= '9') || character == '.' || character == '/';
+        return Path.isAllowedInPathValue(character);
     }
 }

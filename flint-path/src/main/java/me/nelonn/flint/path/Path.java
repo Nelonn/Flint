@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.OptionalInt;
+import java.util.function.Function;
 
 public interface Path extends Comparable<Path> {
     @NotNull
@@ -81,16 +82,24 @@ public interface Path extends Comparable<Path> {
     }
 
     static @NotNull OptionalInt checkNamespace(@NotNull String namespace) {
-        for (int i = 0, length = namespace.length(); i < length; i++) {
-            if (!isAllowedInNamespace(namespace.charAt(i))) {
-                return OptionalInt.of(i);
-            }
-        }
-        return OptionalInt.empty();
+        return check(namespace, Path::isAllowedInNamespace);
     }
 
     static boolean isAllowedInNamespace(char character) {
         return character == '_' || character == '-' || (character >= 'a' && character <= 'z') || (character >= '0' && character <= '9') || character == '.';
+    }
+
+    static boolean isAllowedInPathValue(char character) {
+        return character == '_' || character == '-' || (character >= 'a' && character <= 'z') || (character >= '0' && character <= '9') || character == '.' || character == '/';
+    }
+
+    static @NotNull OptionalInt check(@NotNull String string, @NotNull Function<Character, Boolean> checker) {
+        for (int i = 0, length = string.length(); i < length; i++) {
+            if (!checker.apply(string.charAt(i))) {
+                return OptionalInt.of(i);
+            }
+        }
+        return OptionalInt.empty();
     }
 
     @Override

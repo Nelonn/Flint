@@ -61,4 +61,8 @@ public interface Key extends Path {
         }
     }
 
+    static boolean isAllowedInKeyValue(char character) {
+        return character == '_' || character == '-' || (character >= 'a' && character <= 'z') || (character >= '0' && character <= '9') || character == '.';
+    }
+
 }

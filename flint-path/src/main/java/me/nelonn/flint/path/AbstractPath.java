@@ -30,32 +30,27 @@ public abstract class AbstractPath implements Path {
     public AbstractPath(@NotNull String namespace, @NotNull String value) {
         Objects.requireNonNull(namespace, "namespace");
         Objects.requireNonNull(value, "value");
-        OptionalInt index = Path.checkNamespace(namespace);
-        if (index.isPresent()) {
-            int indexValue = index.getAsInt();
-            char character = namespace.charAt(indexValue);
-            throw new PathException(namespace, value,
-                    "Non [a-z0-9_.-] character in namespace at index " + indexValue + " ('" + character + "')");
-        }
-        index = checkValue(value);
+        throwNamespace(Path.checkNamespace(namespace), namespace, value);
+        OptionalInt index = Path.check(value, this::isAllowedInValue);
         if (index.isPresent()) {
             int indexValue = index.getAsInt();
             char character = value.charAt(indexValue);
             throw new PathException(namespace, value,
-                    "Non [a-z0-9_.-] character in value at index " + indexValue + " ('" + character + "')");
+                    "Non " + getExceptionValueRegexp() + " character in value at index " + indexValue + " ('" + character + "')");
         }
         this.namespace = namespace;
         this.value = value;
     }
 
-    protected @NotNull OptionalInt checkValue(@NotNull String value) {
-        for (int i = 0, length = value.length(); i < length; i++) {
-            if (!isAllowedInValue(value.charAt(i))) {
-                return OptionalInt.of(i);
-            }
-        }
-        return OptionalInt.empty();
+    public static void throwNamespace(@NotNull OptionalInt index, @NotNull String namespace, @NotNull String value) {
+        if (!index.isPresent()) return;
+        int indexValue = index.getAsInt();
+        char character = namespace.charAt(indexValue);
+        throw new PathException(namespace, value,
+                "Non [a-z0-9_.-] character in namespace at index " + indexValue + " ('" + character + "')");
     }
+
+    protected abstract @NotNull String getExceptionValueRegexp();
 
     protected abstract boolean isAllowedInValue(char character);
 
